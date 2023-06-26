@@ -1,0 +1,57 @@
+Security footage shows that there were 2 witnesses. The first witness lives at the last house on "Northwestern Dr". The second witness, named Annabel, lives somewhere on "Franklin Ave".
+
+Witness 1
+
+SELECT *
+FROM person
+WHERE ( address_street_name = 'Northwestern Dr')
+ORDER BY address_number DESC
+
+RESULT
+
+
+Witness 2
+
+SELECT *
+FROM person
+WHERE address_street_name = 'Franklin Ave' AND name LIKE 'Annabel%'
+
+Annabel Miller 16371
+I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th.
+
+SELECT per.name, inter.person_id, inter.transcript
+FROM interview inter
+JOIN person per ON inter.person_id = per.id
+WHERE id = 16371;
+
+VILLAIN QUERY
+
+SELECT 
+	per.id, per.name,
+	lcs.gender, lcs.height, lcs.hair_color, lcs.car_make, lcs.car_model,
+	fb.event_id, fb.event_name, SUBSTR(CAST(fb.date AS CHAR), 1, 6) as fb_date,
+	COUNT(*) as event_attends
+FROM 
+	person per
+JOIN 
+	drivers_license lcs ON per.license_id = lcs.id
+JOIN 
+	facebook_event_checkin fb ON per.id = fb.person_id
+WHERE 
+	lcs.gender = 'female'
+	AND 
+		(lcs.height >= 65 AND lcs.height <= 67)
+	AND 
+		lcs.hair_color = 'red'
+	AND 
+		lcs.car_make = 'Tesla'
+	AND 
+		lcs.car_model = 'Model S'
+	AND
+		event_name = 'SQL Symphony Concert'
+	AND
+		SUBSTR(CAST(fb.date AS CHAR), 1, 6) = '201712'
+GROUP BY 
+	per.name
+HAVING 
+	event_attends = 3;

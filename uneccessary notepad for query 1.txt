@@ -1,0 +1,70 @@
+SELECT per.id, per.name, per.license_id, gym.id as gym_id, 
+gym.membership_status, lcs.plate_number
+FROM person per
+JOIN get_fit_now_member gym ON per.id = gym.person_id
+JOIN drivers_license lcs ON per.license_id = lcs.id
+WHERE gym.id LIKE '48Z%'
+AND gym.membership_status = 'gold'
+AND lcs.plate_number LIKE '%H42W%';
+
+SELECT per.id, per.name, per.license_id, 
+lcs.gender, lcs.height, lcs.car_make, lcs.car_model
+FROM person per
+JOIN drivers_license lcs ON per.license_id = lcs.id
+WHERE (lcs.height = 65 OR lcs.height = 67)
+AND lcs.car_make = 'Tesla'
+AND lcs.car_model = 'Model S';
+
+SELECT per.id, per.name, per.license_id, 
+lcs.gender, lcs.height, lcs.hair_color, lcs.car_make, lcs.car_model
+FROM person per
+JOIN drivers_license lcs ON per.license_id = lcs.id
+WHERE lcs.gender = 'female'
+AND (lcs.height = 65 OR lcs.height = 67)
+AND lcs.hair_color = 'red'
+AND lcs.car_make = 'Tesla'
+AND lcs.car_model = 'Model S';
+
+SELECT person_id, COUNT(person_id) = 3 as attends
+FROM facebook_event_checkin
+WHERE event_name = 'SQL Symphony Concert'
+GROUP BY person_id
+
+78881
+
+WHERE gym.membership_start_date > 0000
+WHERE RIGHT(gym.membership_start_date, 4) = 0109
+
+SELECT per.id, per.name, per.license_id, gym.id AS gym_id, 
+gym.membership_status, SUBSTR(CAST(gym.membership_start_date AS CHAR), -4) AS membership_start_date
+FROM person per
+JOIN get_fit_now_member gym ON per.id = gym.person_id
+WHERE SUBSTR(CAST(gym.membership_start_date AS CHAR), -4) = '0109';
+
+SELECT 
+	per.id, per.name, fb.event_id, fb.event_name, 
+	SUBSTR(CAST(fb.date AS CHAR), 6) as date
+FROM person per
+JOIN facebook_event_checkin fb ON per.id = fb.person_id
+WHERE event_name = 'SQL Symphony Concert'
+AND SUBSTR(CAST(fb.date AS CHAR), 6) = '201712';
+
+SELECT 
+	per.id, per.name, fb.event_id, fb.event_name, 
+	SUBSTR(CAST(fb.date AS CHAR), 1, 6) as date,
+	COUNT(*) as event_attends,
+	lcs.gender
+FROM 
+	person per
+JOIN 
+	facebook_event_checkin fb ON per.id = fb.person_id
+JOIN
+	drivers_license lcs ON lcs.id = per.license_id
+WHERE 
+	event_name = 'SQL Symphony Concert'
+	AND 
+		SUBSTR(CAST(fb.date AS CHAR), 1, 6) = '201712'
+GROUP BY 
+	per.name
+HAVING 
+	event_attends = 3;
